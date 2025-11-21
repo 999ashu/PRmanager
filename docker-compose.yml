@@ -1,0 +1,100 @@
+services:
+    postgres:
+      image: postgres:17
+      container_name: service-postgres
+      environment:
+          - POSTGRES_DB=dispatcher_db_1
+          - POSTGRES_USER=admin
+          - POSTGRES_PASSWORD=admin
+          - PGDATA=/var/lib/postgresql/data/pgdata
+      ports:
+          - "5432:5432"
+      volumes:
+          - ./PRmanager/postgresql/schemas:/docker-entrypoint-initdb.d/01-schemas
+          - ./PRmanager/postgresql/data:/docker-entrypoint-initdb.d/02-data
+          - postgres_data:/var/lib/postgresql/data
+          - ./PRmanager/postgresql/migrations:/migrations
+          - ./PRmanager/scripts/apply_migrations.sh/apply_migrations.sh:/usr/local/bin/apply_migrations.sh:ro
+      networks:
+          - postgres
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U admin -d dispatcher_db_1"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+        start_period: 30s
+
+    migrations-runner:
+      image: postgres:17
+      container_name: service-migrations-runner
+      environment:
+        - POSTGRES_DB=dispatcher_db_1
+        - POSTGRES_USER=admin
+        - POSTGRES_PASSWORD=admin
+        - POSTGRES_HOST=postgres
+        - POSTGRES_PORT=5432
+      volumes:
+        - ./PRmanager/postgresql/migrations:/migrations:ro
+        - ./PRmanager/scripts/apply_migrations.sh/apply_migrations.sh:/usr/local/bin/apply_migrations.sh:ro
+      entrypoint: ["bash", "/usr/local/bin/apply_migrations.sh", "/migrations"]
+      depends_on:
+        postgres:
+          condition: service_healthy
+      networks:
+        - postgres
+      restart: "no"
+
+    dispatcher:
+        image: ghcr.io/userver-framework/ubuntu-22.04-userver-pg-dev:latest
+        privileged: true
+        environment:
+          - POSTGRES_DB=dispatcher_db_1
+          - POSTGRES_USER=admin
+          - POSTGRES_PASSWORD=admin
+          - POSTGRES_HOST=postgres
+          - POSTGRES_PORT=5432
+          - PREFIX=${PREFIX:-~/.local}
+          - LOCAL_UID=${LOCAL_UID:-1000}
+          - LOCAL_GID=${LOCAL_GID:-1000}
+          - CC
+          - CCACHE_DIR=/backend/dispatcher/.ccache
+          - CCACHE_HASHDIR
+          - CCACHE_NOHASHDIR
+          - CCACHE_PREFIX
+          - CCACHE_SIZE
+          - CMAKE_OPTS
+          - CORES_DIR=/cores
+          - CXX
+          - MAKE_OPTS
+        volumes:
+          - ./PRmanager:/backend/dispatcher:rw
+          - ./PRmanager/tests:/tools:ro
+          - ${TC_CORES_DIR:-./.cores}:/cores:rw
+        ports:
+          - 8080:8080
+          - 8081:8081  # Metrics port
+        working_dir: /backend/dispatcher
+        entrypoint:
+          - /backend/dispatcher/run_as_user.sh
+        command: 
+          - "${LOCAL_UID:-1000}"
+          - "${LOCAL_GID:-1000}"
+          - /backend/dispatcher/build-release/PRmanager
+          - --config
+          - /backend/dispatcher/configs/static_config.yaml
+          - --config_vars
+          - /backend/dispatcher/configs/config_vars.yaml
+        depends_on:
+          postgres:
+            condition: service_healthy
+          migrations-runner:
+            condition: service_completed_successfully
+        networks:
+          - postgres
+
+networks:
+    postgres:
+        driver: bridge
+
+volumes:
+  postgres_data:
