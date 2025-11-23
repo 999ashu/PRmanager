@@ -1,0 +1,9 @@
+# Ensure shell scripts always use LF line endings, even on Windows
+*.sh text eol=lf
+run_as_user.sh text eol=lf
+
+# SQL files should also use LF
+*.sql text eol=lf
+
+# Default behavior for other text files
+* text=auto

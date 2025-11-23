@@ -24,3 +24,4 @@ if [ ! -d "$HOME" ]; then
 fi
 
 sudo -E -u user "$@"
+
