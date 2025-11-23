@@ -7,4 +7,4 @@ is-testing: true
 server-port: 8080
 
 # change to URI of your postgres database
-pg-connection: postgresql://admin:admin@host.docker.internal:5432/dispatcher_db_1
+pg-connection: postgresql://admin:admin@host.docker.internal:5432/prmanager_db

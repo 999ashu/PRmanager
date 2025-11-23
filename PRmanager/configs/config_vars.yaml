@@ -7,4 +7,4 @@ is-testing: false
 server-port: 8080
 
 # PostgreSQL connection string
-pg-connection: postgresql://admin:admin@postgres:5432/dispatcher_db_1
+pg-connection: postgresql://admin:admin@postgres:5432/prmanager_db

@@ -3,7 +3,7 @@ services:
       image: postgres:17
       container_name: service-postgres
       environment:
-          - POSTGRES_DB=dispatcher_db_1
+          - POSTGRES_DB=prmanager_db
           - POSTGRES_USER=admin
           - POSTGRES_PASSWORD=admin
           - PGDATA=/var/lib/postgresql/data/pgdata
@@ -18,7 +18,7 @@ services:
       networks:
           - postgres
       healthcheck:
-        test: ["CMD-SHELL", "pg_isready -U admin -d dispatcher_db_1"]
+        test: ["CMD-SHELL", "pg_isready -U admin -d prmanager_db"]
         interval: 10s
         timeout: 5s
         retries: 5
@@ -28,7 +28,7 @@ services:
       image: postgres:17
       container_name: service-migrations-runner
       environment:
-        - POSTGRES_DB=dispatcher_db_1
+        - POSTGRES_DB=prmanager_db
         - POSTGRES_USER=admin
         - POSTGRES_PASSWORD=admin
         - POSTGRES_HOST=postgres
@@ -62,7 +62,7 @@ services:
         working_dir: /PRmanager
         command: >
           bash -c "
-          make build-release
+          /PRmanager/run_as_user.sh ${LOCAL_UID:-1000} ${LOCAL_GID:-1000} make build-release
           "
         restart: "no"
 
@@ -71,7 +71,7 @@ services:
         platform: linux/amd64
         privileged: true
         environment:
-          - POSTGRES_DB=dispatcher_db_1
+          - POSTGRES_DB=prmanager_db
           - POSTGRES_USER=admin
           - POSTGRES_PASSWORD=admin
           - POSTGRES_HOST=postgres
