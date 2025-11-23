@@ -1,5 +1,5 @@
-#include "user_set_is_active_handler.hpp"
-#include "../models/user_model.hpp"
+#include "user_set_is_active.hpp"
+#include "../models/user.hpp"
 
 #include <userver/components/component_context.hpp>
 #include <userver/formats/json.hpp>

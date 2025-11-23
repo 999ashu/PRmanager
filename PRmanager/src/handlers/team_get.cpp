@@ -1,5 +1,5 @@
-#include "team_get_handler.hpp"
-#include "../models/team_model.hpp"
+#include "team_get.hpp"
+#include "../models/team.hpp"
 
 #include <userver/components/component_context.hpp>
 #include <userver/formats/json.hpp>

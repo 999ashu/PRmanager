@@ -1,4 +1,4 @@
-#include "pull_request_model.hpp"
+#include "pull_request.hpp"
 
 namespace prmanager::models {
 

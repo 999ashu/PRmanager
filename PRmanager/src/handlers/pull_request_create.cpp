@@ -1,5 +1,5 @@
-#include "pull_request_create_handler.hpp"
-#include "../models/pull_request_model.hpp"
+#include "pull_request_create.hpp"
+#include "../models/pull_request.hpp"
 
 #include <userver/components/component_context.hpp>
 #include <userver/formats/json.hpp>

@@ -1,6 +1,6 @@
-#include "mass_deactivate_handler.hpp"
-#include "../models/stats_model.hpp"
-#include "../models/user_model.hpp"
+#include "mass_deactivate.hpp"
+#include "../models/stats.hpp"
+#include "../models/user.hpp"
 
 #include <userver/components/component_context.hpp>
 #include <userver/formats/json.hpp>

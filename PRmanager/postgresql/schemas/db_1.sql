@@ -12,7 +12,6 @@ CREATE TABLE prmanager.users (
     is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
--- Use TEXT instead of ENUM for status
 CREATE TABLE prmanager.pull_requests (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,

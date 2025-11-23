@@ -1,5 +1,5 @@
-#include "stats_handler.hpp"
-#include "../models/stats_model.hpp"
+#include "stats.hpp"
+#include "../models/stats.hpp"
 
 #include <userver/components/component_context.hpp>
 #include <userver/formats/json.hpp>

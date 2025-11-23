@@ -1,4 +1,4 @@
-#include "stats_model.hpp"
+#include "stats.hpp"
 
 namespace prmanager::models {
 

@@ -1,4 +1,4 @@
-#include "user_model.hpp"
+#include "user.hpp"
 
 namespace prmanager::models {
 

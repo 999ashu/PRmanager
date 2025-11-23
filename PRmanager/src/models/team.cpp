@@ -1,4 +1,4 @@
-#include "team_model.hpp"
+#include "team.hpp"
 
 namespace prmanager::models {
 

@@ -1,5 +1,5 @@
-#include "user_get_review_handler.hpp"
-#include "../models/pull_request_model.hpp"
+#include "user_get_review.hpp"
+#include "../models/pull_request.hpp"
 
 #include <userver/components/component_context.hpp>
 #include <userver/formats/json.hpp>
