@@ -14,7 +14,13 @@ fi
 
 # Create user if it doesn't exist
 if ! id -u $OLD_UID > /dev/null 2>&1; then
-    useradd --uid $OLD_UID --gid $OLD_GID --non-unique user
+    useradd --uid $OLD_UID --gid $OLD_GID --non-unique --create-home --home-dir /home/user user
+fi
+
+export HOME=/home/user
+if [ ! -d "$HOME" ]; then
+    mkdir -p "$HOME"
+    chown "$OLD_UID:$OLD_GID" "$HOME"
 fi
 
 sudo -E -u user "$@"

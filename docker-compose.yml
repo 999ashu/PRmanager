@@ -12,7 +12,7 @@ services:
       volumes:
           - ./PRmanager/postgresql/schemas:/docker-entrypoint-initdb.d/01-schemas
           - ./PRmanager/postgresql/data:/docker-entrypoint-initdb.d/02-data
-          - postgres_data:/var/lib/postgresql/data
+          - prmanager_postgres_data:/var/lib/postgresql/data
           - ./PRmanager/postgresql/migrations:/migrations
           - ./PRmanager/scripts/apply_migrations.sh/apply_migrations.sh:/usr/local/bin/apply_migrations.sh:ro
       networks:
@@ -96,7 +96,7 @@ services:
         volumes:
           - ./PRmanager:/PRmanager:rw
           - ./PRmanager/tests:/tools:ro
-          - ./build:/PRmanager/build-release:ro
+          - ./build:/PRmanager/build-release:rw
           - ${TC_CORES_DIR:-./.cores}:/cores:rw
         ports:
           - 8080:8080
@@ -104,7 +104,7 @@ services:
         working_dir: /PRmanager
         command: >
           bash -c "
-          make start-release
+          /PRmanager/run_as_user.sh ${LOCAL_UID:-1000} ${LOCAL_GID:-1000} make start-release
           "
         depends_on:
           postgres:
@@ -121,4 +121,4 @@ networks:
         driver: bridge
 
 volumes:
-  postgres_data:
+  prmanager_postgres_data:
