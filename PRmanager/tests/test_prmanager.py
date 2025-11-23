@@ -11,7 +11,7 @@ async def test_team_add_success(service_client):
             {"user_id": "u2", "username": "Bob", "is_active": True},
         ]
     }
-    
+
     response = await service_client.post("/team/add", json=team_data)
     assert response.status == 201
     data = response.json()
@@ -27,10 +27,10 @@ async def test_team_add_duplicate(service_client):
             {"user_id": "u3", "username": "Charlie", "is_active": True},
         ]
     }
-    
+
     response = await service_client.post("/team/add", json=team_data)
     assert response.status == 201
-    
+
     response = await service_client.post("/team/add", json=team_data)
     assert response.status == 400
     data = response.json()
@@ -46,7 +46,7 @@ async def test_team_get_success(service_client):
         ]
     }
     await service_client.post("/team/add", json=team_data)
-    
+
     response = await service_client.get("/team/get", params={"team_name": "frontend"})
     assert response.status == 200
     data = response.json()
@@ -69,7 +69,7 @@ async def test_user_set_is_active(service_client):
         ]
     }
     await service_client.post("/team/add", json=team_data)
-    
+
     response = await service_client.post(
         "/users/setIsActive",
         json={"user_id": "u20", "is_active": False}
@@ -100,7 +100,7 @@ async def test_pr_create_with_reviewers(service_client):
         ]
     }
     await service_client.post("/team/add", json=team_data)
-    
+
     pr_data = {
         "pull_request_id": "pr-100",
         "pull_request_name": "Add mobile feature",
@@ -124,7 +124,7 @@ async def test_pr_create_with_inactive_users(service_client):
         ]
     }
     await service_client.post("/team/add", json=team_data)
-    
+
     pr_data = {
         "pull_request_id": "pr-101",
         "pull_request_name": "Fix bug",
@@ -144,16 +144,16 @@ async def test_pr_create_duplicate(service_client):
         ]
     }
     await service_client.post("/team/add", json=team_data)
-    
+
     pr_data = {
         "pull_request_id": "pr-102",
         "pull_request_name": "Test PR",
         "author_id": "u50"
     }
-    
+
     response = await service_client.post("/pullRequest/create", json=pr_data)
     assert response.status == 201
-    
+
     response = await service_client.post("/pullRequest/create", json=pr_data)
     assert response.status == 409
     data = response.json()
@@ -169,14 +169,14 @@ async def test_pr_merge_success(service_client):
         ]
     }
     await service_client.post("/team/add", json=team_data)
-    
+
     pr_data = {
         "pull_request_id": "pr-103",
         "pull_request_name": "API update",
         "author_id": "u60"
     }
     await service_client.post("/pullRequest/create", json=pr_data)
-    
+
     response = await service_client.post(
         "/pullRequest/merge",
         json={"pull_request_id": "pr-103"}
@@ -195,28 +195,28 @@ async def test_pr_merge_idempotent(service_client):
         ]
     }
     await service_client.post("/team/add", json=team_data)
-    
+
     pr_data = {
         "pull_request_id": "pr-104",
         "pull_request_name": "Security fix",
         "author_id": "u70"
     }
     await service_client.post("/pullRequest/create", json=pr_data)
-    
+
     response1 = await service_client.post(
         "/pullRequest/merge",
         json={"pull_request_id": "pr-104"}
     )
     assert response1.status == 200
     merged_at_1 = response1.json()["pr"]["mergedAt"]
-    
+
     response2 = await service_client.post(
         "/pullRequest/merge",
         json={"pull_request_id": "pr-104"}
     )
     assert response2.status == 200
     merged_at_2 = response2.json()["pr"]["mergedAt"]
-    
+
     assert merged_at_1 == merged_at_2
 
 
@@ -231,7 +231,7 @@ async def test_pr_reassign_success(service_client):
         ]
     }
     await service_client.post("/team/add", json=team_data)
-    
+
     pr_data = {
         "pull_request_id": "pr-105",
         "pull_request_name": "Data pipeline",
@@ -240,7 +240,7 @@ async def test_pr_reassign_success(service_client):
     create_response = await service_client.post("/pullRequest/create", json=pr_data)
     reviewers = create_response.json()["pr"]["assigned_reviewers"]
     assert len(reviewers) == 2
-    
+
     old_reviewer = reviewers[0]
     response = await service_client.post(
         "/pullRequest/reassign",
@@ -262,7 +262,7 @@ async def test_pr_reassign_merged_pr(service_client):
         ]
     }
     await service_client.post("/team/add", json=team_data)
-    
+
     pr_data = {
         "pull_request_id": "pr-106",
         "pull_request_name": "Cloud migration",
@@ -270,12 +270,12 @@ async def test_pr_reassign_merged_pr(service_client):
     }
     create_response = await service_client.post("/pullRequest/create", json=pr_data)
     reviewers = create_response.json()["pr"]["assigned_reviewers"]
-    
+
     await service_client.post(
         "/pullRequest/merge",
         json={"pull_request_id": "pr-106"}
     )
-    
+
     if reviewers:
         response = await service_client.post(
             "/pullRequest/reassign",
@@ -295,14 +295,14 @@ async def test_pr_reassign_not_assigned(service_client):
         ]
     }
     await service_client.post("/team/add", json=team_data)
-    
+
     pr_data = {
         "pull_request_id": "pr-107",
         "pull_request_name": "Infrastructure update",
         "author_id": "u100"
     }
     await service_client.post("/pullRequest/create", json=pr_data)
-    
+
     response = await service_client.post(
         "/pullRequest/reassign",
         json={"pull_request_id": "pr-107", "old_user_id": "u100"}
@@ -322,7 +322,7 @@ async def test_user_get_review(service_client):
         ]
     }
     await service_client.post("/team/add", json=team_data)
-    
+
     for i in range(3):
         pr_data = {
             "pull_request_id": f"pr-20{i}",
@@ -330,7 +330,7 @@ async def test_user_get_review(service_client):
             "author_id": "u110"
         }
         await service_client.post("/pullRequest/create", json=pr_data)
-    
+
     response = await service_client.get("/users/getReview", params={"user_id": "u111"})
     assert response.status == 200
     data = response.json()
