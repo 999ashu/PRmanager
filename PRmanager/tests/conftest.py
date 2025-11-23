@@ -24,3 +24,25 @@ def pgsql_local(service_source_dir, pgsql_local_create):
         [service_source_dir.joinpath("postgresql/schemas")],
     )
     return pgsql_local_create(list(databases.values()))
+
+
+@pytest.fixture
+def create_team(service_client):
+    """Return a helper to create teams during tests."""
+
+    async def _create(team_data):
+        resp = await service_client.post("/team/add", json=team_data)
+        return resp
+
+    return _create
+
+
+@pytest.fixture
+def create_pr(service_client):
+    """Return a helper to create pull requests during tests."""
+
+    async def _create(pr_data):
+        resp = await service_client.post("/pullRequest/create", json=pr_data)
+        return resp
+
+    return _create

@@ -32,10 +32,13 @@ target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::core
 add_executable(${PROJECT_NAME} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
 
-# Unit Tests - disabled for now (placeholder tests reference non-existent
-# functions) add_executable(${PROJECT_NAME}_unittest src/greeting_test.cpp)
-# target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_objs
-# userver::utest) add_google_tests(${PROJECT_NAME}_unittest)
+file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/unittests/*.cpp")
+if(TEST_SOURCES)
+  add_executable(${PROJECT_NAME}_unittests ${TEST_SOURCES})
+  target_link_libraries(${PROJECT_NAME}_unittests PRIVATE ${PROJECT_NAME}_objs
+                                                          userver::utest)
+  add_google_tests(${PROJECT_NAME}_unittests)
+endif()
 
 # Benchmarks - disabled for now (placeholder benchmarks reference non-existent
 # functions) add_executable(${PROJECT_NAME}_benchmark
