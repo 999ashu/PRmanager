@@ -54,6 +54,7 @@ services:
           - LOCAL_GID=${LOCAL_GID:-1000}
           - CC
           - CXX
+          - CCACHE_DIR=/PRmanager/.ccache
           - CMAKE_OPTS=-DCMAKE_BUILD_TYPE=Release
           - MAKE_OPTS=-j$(nproc)
         volumes:
