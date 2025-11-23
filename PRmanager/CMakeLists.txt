@@ -11,8 +11,9 @@ find_package(
   QUIET)
 
 if(NOT userver_FOUND)
-  # Tries TRY_DIR first, falls back to downloading userver from GitHub using
-  # CPM.
+  set(USERVER_DISABLE_USERFAULTFD
+      ON
+      CACHE BOOL "" FORCE)
   download_userver(TRY_DIR third_party/userver)
 endif()
 

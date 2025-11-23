@@ -44,8 +44,31 @@ services:
         - postgres
       restart: "no"
 
-    dispatcher:
+    builder:
         image: ghcr.io/userver-framework/ubuntu-22.04-userver-pg-dev:latest
+        platform: linux/amd64
+        container_name: service-builder
+        environment:
+          - PREFIX=${PREFIX:-~/.local}
+          - LOCAL_UID=${LOCAL_UID:-1000}
+          - LOCAL_GID=${LOCAL_GID:-1000}
+          - CC
+          - CXX
+          - CMAKE_OPTS=-DCMAKE_BUILD_TYPE=Release
+          - MAKE_OPTS=-j$(nproc)
+        volumes:
+          - ./PRmanager:/PRmanager:rw
+          - ./build:/PRmanager/build-release:rw
+        working_dir: /PRmanager
+        command: >
+          bash -c "
+          make build-release
+          "
+        restart: "no"
+
+    PRmanager:
+        image: ghcr.io/userver-framework/ubuntu-22.04-userver-pg-dev:latest
+        platform: linux/amd64
         privileged: true
         environment:
           - POSTGRES_DB=dispatcher_db_1
@@ -57,7 +80,7 @@ services:
           - LOCAL_UID=${LOCAL_UID:-1000}
           - LOCAL_GID=${LOCAL_GID:-1000}
           - CC
-          - CCACHE_DIR=/backend/dispatcher/.ccache
+          - CCACHE_DIR=/PRmanager/.ccache
           - CCACHE_HASHDIR
           - CCACHE_NOHASHDIR
           - CCACHE_PREFIX
@@ -66,28 +89,29 @@ services:
           - CORES_DIR=/cores
           - CXX
           - MAKE_OPTS
+          - USERVER_DISABLE_USERFAULTFD=1
+          - USERVER_NO_USERFAULTFD=1
+          - USERVER_USE_USERFAULTFD=0
+          - USERVER_STACK_USAGE_MONITOR=0
         volumes:
-          - ./PRmanager:/backend/dispatcher:rw
+          - ./PRmanager:/PRmanager:rw
           - ./PRmanager/tests:/tools:ro
+          - ./build:/PRmanager/build-release:ro
           - ${TC_CORES_DIR:-./.cores}:/cores:rw
         ports:
           - 8080:8080
           - 8081:8081  # Metrics port
-        working_dir: /backend/dispatcher
-        entrypoint:
-          - /backend/dispatcher/run_as_user.sh
-        command: 
-          - "${LOCAL_UID:-1000}"
-          - "${LOCAL_GID:-1000}"
-          - /backend/dispatcher/build-release/PRmanager
-          - --config
-          - /backend/dispatcher/configs/static_config.yaml
-          - --config_vars
-          - /backend/dispatcher/configs/config_vars.yaml
+        working_dir: /PRmanager
+        command: >
+          bash -c "
+          make start-release
+          "
         depends_on:
           postgres:
             condition: service_healthy
           migrations-runner:
+            condition: service_completed_successfully
+          builder:
             condition: service_completed_successfully
         networks:
           - postgres

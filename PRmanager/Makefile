@@ -72,7 +72,8 @@ $(addprefix docker-cmake-, $(PRESETS)) $(addprefix docker-build-, $(PRESETS)) $(
 		--network=host \
 		-v $$PWD:$$PWD \
 		-w $$PWD \
-		$(DOCKER_IMAGE) \
-		env CCACHE_DIR=$$PWD/.ccache \
-		    HOME=$$HOME \
-		    $$PWD/run_as_user.sh $(shell /bin/id -u) $(shell /bin/id -g) make $*
+		--platform=linux/amd64 \
+        $(DOCKER_IMAGE) \
+        env CCACHE_DIR=$$PWD/.ccache \
+            HOME=$$HOME \
+            $$PWD/run_as_user.sh $(shell id -u) $(shell id -g) make $*
