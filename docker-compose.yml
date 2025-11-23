@@ -48,6 +48,8 @@ services:
         image: ghcr.io/userver-framework/ubuntu-22.04-userver-pg-dev:latest
         platform: linux/amd64
         container_name: service-builder
+        privileged: true
+        user: root
         environment:
           - PREFIX=${PREFIX:-~/.local}
           - LOCAL_UID=${LOCAL_UID:-1000}
@@ -63,6 +65,7 @@ services:
         working_dir: /PRmanager
         command: >
           bash -c "
+          chown -R ${LOCAL_UID:-1000}:${LOCAL_GID:-1000} /PRmanager /PRmanager/build-release &&
           /PRmanager/run_as_user.sh ${LOCAL_UID:-1000} ${LOCAL_GID:-1000} make build-release
           "
         restart: "no"

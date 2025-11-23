@@ -23,5 +23,10 @@ if [ ! -d "$HOME" ]; then
     chown "$OLD_UID:$OLD_GID" "$HOME"
 fi
 
+# Ensure user has access to working directory
+if [ -n "${PWD:-}" ]; then
+    chown -R "$OLD_UID:$OLD_GID" "$PWD" 2>/dev/null || true
+fi
+
 sudo -E -u user "$@"
 
